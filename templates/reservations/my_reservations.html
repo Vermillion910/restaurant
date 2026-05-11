@@ -1,0 +1,105 @@
+{% extends 'reservations/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Мои бронирования</h2>
+
+    {% if reservations or favorites %}
+    <div class="profile-tabs">
+        <button class="profile-tab active" onclick="showTab('reservations', this)">Бронирования</button>
+        <button class="profile-tab" onclick="showTab('favorites', this)">Избранное</button>
+    </div>
+
+    <!-- Бронирования -->
+    <div id="tab-reservations">
+        {% if reservations %}
+        {% for r in reservations %}
+        <div class="order-card">
+            <div class="order-header">
+                <strong>Бронь №{{ r.user_number }}</strong> от {{ r.created_at|date:"d.m.Y H:i" }}
+                <span class="badge badge-accepted">{{ r.get_status_display }}</span>
+            </div>
+            <div class="order-body">
+                <p><strong>Дата:</strong> {{ r.date }} <strong>Время:</strong> {{ r.time }} | <strong>Гостей:</strong> {{ r.guests_count }}</p>
+                <p><strong>Имя:</strong> {{ r.first_name }} {{ r.last_name }} | <strong>Телефон:</strong> {{ r.phone }}</p>
+
+                {% if r.order %}
+                <div class="order-details">
+                    <h4>Заказ блюд:</h4>
+                    <table>
+                        <thead>
+                            <tr><th>Блюдо</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for item in r.order.items.all %}
+                            <tr>
+                                <td>{{ item.menu_item.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.price }} руб.</td>
+                                <td>{{ item.total_price }} руб.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <p class="order-total"><strong>Итого: {{ r.order.total_price }} руб.</strong></p>
+                </div>
+                {% endif %}
+
+                <div class="order-actions">
+                    {% if r.status != 'cancelled' and r.status != 'completed' %}
+                    <a href="/cancel/{{ r.id }}/" class="btn btn-danger btn-sm">Отменить</a>
+                    {% endif %}
+                    {% if r.order %}
+                    <a href="{% url 'repeat_order' r.id %}" class="btn btn-primary btn-sm">Повторить заказ</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="text-align: center; color: #a09080; padding: 40px;">У вас пока нет бронирований</p>
+        {% endif %}
+    </div>
+
+    <!-- Избранное -->
+    <div id="tab-favorites" style="display: none;">
+        {% if favorites %}
+        <div class="favorites-row">
+            {% for item in favorites %}
+            <div class="favorite-card">
+                <div class="favorite-card-image">
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                    {% else %}
+                        <div class="no-photo">Нет фото</div>
+                    {% endif %}
+                </div>
+                <div class="favorite-card-body">
+                    <strong>{{ item.name }}</strong>
+                    <span class="favorite-card-price">{{ item.price }} руб.</span>
+                </div>
+               <a href="{% url 'add_favorite' item.id %}?next=my_reservations#tab-favorites" class="favorite-remove-text">Убрать</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="text-align: center; color: #a09080; padding: 40px;">У вас пока нет избранных блюд</p>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <p style="text-align: center; color: #a09080; padding: 40px;">У вас пока нет бронирований</p>
+    {% endif %}
+
+</div>
+
+<script>
+function showTab(tabName, btn) {
+    document.getElementById('tab-reservations').style.display = tabName === 'reservations' ? 'block' : 'none';
+    document.getElementById('tab-favorites').style.display = tabName === 'favorites' ? 'block' : 'none';
+
+    document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+}
+</script>
+{% endblock %}

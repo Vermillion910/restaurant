@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ресторан "Афродита"</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    <!-- Шапка (всегда видна) -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                    <img src="{% static 'images/logo.svg' %}" alt="Афродита" style="height: 40px;">
+                    <span style="color: #d4c4a8; font-size: 22px; letter-spacing: 2px;">Афродита</span>
+                </a>
+            </div>
+            <div class="nav-links">
+                <a href="/">Главная</a>
+                <a href="/menu/">Меню</a>
+                <a href="/profile/">Профиль</a>
+                <a href="/events/">События</a>
+                {% if user.is_authenticated %}
+                    <a href="/reserve/">Забронировать</a>
+                    <a href="/my-reservations/">Мои брони</a>
+                {% endif %}
+            </div>
+            <div class="user-menu">
+                {% if user.is_authenticated %}
+                    <span class="username">{{ user.username }}</span>
+                    <form method="post" action="/accounts/logout/" class="logout-form">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-btn">Выйти</button>
+                    </form>
+                {% else %}
+                    <a href="/register/">Регистрация</a>
+                    <a href="/accounts/login/">Войти</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Ресторан "Афродита"</h4>
+                <p>Изысканные блюда средиземноморской кухни</p>
+            </div>
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>ул. Примерная, д. 123</p>
+                <p>тел.: +7 (123) 456-78-90</p>
+                <p>email: afrodita@restaurant.ru</p>
+            </div>
+            <div class="footer-section">
+                <h4>Часы работы</h4>
+                <p>Пн-Вс: 10:00 - 22:00</p>
+                <p>Без выходных</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Ресторан "Афродита". Все права защищены.</p>
+        </div>
+    </footer>
+</body>
+</html>

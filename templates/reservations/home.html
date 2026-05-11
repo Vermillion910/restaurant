@@ -1,0 +1,108 @@
+{% extends 'reservations/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Главный баннер на весь экран -->
+
+    <div class="hero-fullscreen">
+        <div class="hero-overlay">
+            <p class="hero-subtitle">Проводник в мир средиземноморской кухни</p>
+            <h1 class="hero-title">Ресторан "Афродита"</h1>
+            <p class="hero-contacts">
+                Москва, ул. Примерная, д. 123<br>
+                +7 (123) 456-78-90
+            </p>
+            <a href="/reserve/" class="btn hero-btn">Забронировать столик</a>
+        </div>
+    </div>
+    <div class="container">
+    <!-- Специальные предложения -->
+    <div class="offers-grid">
+        <div class="offer-card">
+            <h4>Дневные скидки по будням</h4>
+            <p>Скидка до 30% с 12 до 17 часов на основное меню</p>
+        </div>
+        <div class="offer-card">
+            <h4>Скидка именинникам</h4>
+            <p>15% за неделю до и неделю после дня рождения</p>
+        </div>
+        <div class="offer-card">
+            <h4>Бесплатная парковка</h4>
+            <p>Для гостей ресторана — бесплатно</p>
+        </div>
+    </div>
+
+    <!-- О ресторане -->
+    <div class="about-section">
+       <div class="about-image">
+        {% load static %}
+        <img src="{% static 'images/Maskgroup.png' %}" alt="Интерьер ресторана" style="width: 100%; height: 350px; object-fit: cover; border-radius: 4px;">
+       </div>
+        <div class="about-text">
+            <h2>О ресторане</h2>
+            <p>
+                Уютный ресторан средиземноморской кухни, где каждый гость погружается в атмосферу
+                солнечной Греции и изысканной Италии. Основной акцент в меню сделан на свежайших
+                продуктах и традиционных рецептах.
+            </p>
+            <p>
+                В дизайне ресторана гармонично сочетаются современные тренды, элементы античности
+                и тёплые средиземноморские мотивы.
+            </p>
+            <a href="/menu/" class="btn btn-primary">Посмотреть меню</a>
+        </div>
+    </div>
+
+    <!-- О шеф-поваре -->
+    <div class="chef-section">
+        <div class="chef-text">
+            <h2>Шеф-повар</h2>
+            <p>
+                Александр Средиземноморский — бренд-шеф ресторана «Афродита», проходивший обучение
+                в лучших кулинарных школах Италии и Греции.
+            </p>
+            <blockquote>
+                «Средиземноморская кухня — это не просто еда. Это искусство наслаждения жизнью,
+                где каждый ингредиент рассказывает свою историю».
+                <br><strong>— Александр Средиземноморский</strong>
+            </blockquote>
+        </div>
+        <div class="chef-image">
+    <img src="{% static 'images/Victor_Barinov.webp' %}" alt="Шеф-повар" style="width: 280px; height: 350px; object-fit: cover; border-radius: 4px;">
+</div>
+    </div>
+
+    <!-- Форма бронирования -->
+    <div class="reserve-cta">
+        <h2>Забронировать столик</h2>
+        <p>Заполните форму, и мы свяжемся с вами для подтверждения бронирования</p>
+        <a href="/reserve/" class="btn btn-success btn-lg">Забронировать</a>
+        <p class="privacy-note">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности</p>
+    </div>
+
+    <!-- Контакты -->
+    <div class="contacts-section">
+        <div class="contact-col">
+            <h3>Часы работы</h3>
+            <p class="contact-highlight">Ежедневно<br>09:00 - 23:00</p>
+            <p class="contact-note">
+                Меню завтраков: будни 9:00-12:00, вых. 9:00-14:00<br>
+                Основное меню: ежедневно 12:00-23:00
+            </p>
+        </div>
+        <div class="contact-col">
+            <h3>Контакты</h3>
+            <p class="contact-line"><strong>Адрес:</strong><br>Москва, ул. Примерная, д. 123</p>
+            <p class="contact-line"><strong>Телефон:</strong><br>+7 (123) 456-78-90</p>
+            <p class="contact-line"><strong>Почта:</strong><br>afrodita@restaurant.ru</p>
+        </div>
+        <div class="contact-col">
+            <h3>Социальные сети</h3>
+            <p class="contact-line">Telegram: @afrodita_rest</p>
+            <p class="contact-line">Instagram: @afrodita_restaurant</p>
+            <p class="contact-line">VK: vk.com/afrodita_rest</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

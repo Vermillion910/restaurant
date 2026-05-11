@@ -1,0 +1,55 @@
+{% extends 'reservations/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Повторить заказ (бронь №{{ old_reservation.user_number }})</h2>
+
+    <div class="offer-card" style="margin-bottom: 25px; text-align: left;">
+        <p><strong>Предыдущий заказ:</strong></p>
+        {% if old_reservation.order %}
+        <ul style="margin: 10px 0 0 20px;">
+            {% for item in old_reservation.order.items.all %}
+            <li>{{ item.menu_item.name }} x{{ item.quantity }} — {{ item.total_price }} руб.</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+    <div style="max-width: 600px; margin: 0 auto;">
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label>Дата бронирования</label>
+                {{ form.date }}
+            </div>
+            <div class="form-group">
+                <label>Время</label>
+                {{ form.time }}
+            </div>
+            <div class="form-group">
+                <label>Количество гостей</label>
+                {{ form.guests_count }}
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Имя</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Фамилия</label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Телефон</label>
+                {{ form.phone }}
+            </div>
+            
+            <button type="submit" class="btn btn-success" style="width: 100%;">Создать бронирование</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

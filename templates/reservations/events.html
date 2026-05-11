@@ -1,0 +1,46 @@
+{% extends 'reservations/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="events-page">
+    <div class="events-hero">
+        <h1>События</h1>
+        <p>Яркие гастрономические впечатления в ресторане «Афродита»</p>
+    </div>
+
+    <div class="container">
+        {% if events %}
+        <div class="events-grid">
+            {% for event in events %}
+            <a href="{% url 'event_detail' event.id %}" class="event-card-link">
+                <div class="event-card">
+                    <div class="event-image">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" alt="{{ event.title }}">
+                        {% else %}
+                            <div class="event-no-image">Скоро фото</div>
+                        {% endif %}
+                        <div class="event-date-badge">
+                            <span class="event-day">{{ event.date|date:"d" }}</span>
+                            <span class="event-month">{{ event.date|date:"E" }}</span>
+                        </div>
+                    </div>
+                    <div class="event-card-body">
+                        <h3>{{ event.title }}</h3>
+                        <p class="event-card-time">{{ event.date|date:"H:i" }}</p>
+                        <span class="event-card-link-text">Подробнее →</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="events-empty">
+            <div class="events-empty-icon">📅</div>
+            <p>На данный момент событий нет</p>
+            <p class="events-empty-sub">Следите за обновлениями — скоро появятся новые мероприятия</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

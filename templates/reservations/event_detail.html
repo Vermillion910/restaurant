@@ -1,0 +1,29 @@
+{% extends 'reservations/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <a href="{% url 'events' %}" class="back-link">← Все события</a>
+
+    <div class="event-detail">
+        <div class="event-detail-header">
+            <h1 class="event-detail-title">{{ event.title }}</h1>
+            <p class="event-detail-date">{{ event.date|date:"d E Y, H:i" }}</p>
+        </div>
+
+        {% if event.image %}
+        <div class="event-detail-image">
+            <img src="{{ event.image.url }}" alt="{{ event.title }}">
+        </div>
+        {% endif %}
+
+        <div class="event-detail-content">
+            {{ event.description|linebreaks }}
+        </div>
+
+        <div class="event-detail-footer">
+            <a href="/reserve/" class="btn btn-success btn-lg">Забронировать столик</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'reservations/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Заказ блюд к бронированию №{{ reservation.user_number }}</h2>
+    
+    <div class="order-info-card">
+        <p><strong>Дата:</strong> {{ reservation.date }}</p>
+        <p><strong>Время:</strong> {{ reservation.time }}</p>
+        <p><strong>Гостей:</strong> {{ reservation.guests_count }}</p>
+    </div>
+
+    <div class="order-layout">
+        <!-- Меню -->
+        <div class="order-menu">
+            <h3>Меню</h3>
+
+            {% for category in categories %}
+            <h4 class="category-title">{{ category.name }}</h4>
+
+            <div class="order-menu-grid">
+                {% for item in category.menuitem_set.all %}
+                <div class="order-menu-item">
+                    <div class="order-menu-image">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                        {% else %}
+                            <div class="no-photo">Нет фото</div>
+                        {% endif %}
+                    </div>
+                    <div class="order-menu-info">
+                        <strong>{{ item.name }}</strong>
+                        <span class="order-menu-weight">({{ item.weight }})</span>
+                        <p class="order-menu-comp">{{ item.composition }}</p>
+                    </div>
+                    <div class="order-menu-actions">
+                        <span class="order-menu-price">{{ item.price }} руб.</span>
+                        <button onclick="addToOrder({{ reservation.id }}, {{ item.id }})" class="btn btn-primary btn-sm">Добавить</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Корзина -->
+        <div class="order-cart">
+            <div class="order-cart-inner">
+                <h3>Ваш заказ</h3>
+
+                {% if order.items.all %}
+                <div class="order-cart-items">
+                    {% for item in order.items.all %}
+                    <div class="order-cart-item">
+                        <div>
+                            <strong>{{ item.menu_item.name }}</strong>
+                            <span class="order-cart-qty"> x{{ item.quantity }}</span>
+                        </div>
+                        <div class="order-cart-controls">
+                            <span>{{ item.total_price }} руб.</span>
+                        <button onclick="updateItem({{ item.id }}, 'decrease')" class="btn btn-sm qty-btn">-</button>
+                        <button onclick="updateItem({{ item.id }}, 'increase')" class="btn btn-sm qty-btn">+</button>
+                        <button onclick="removeItem({{ item.id }})" class="btn btn-sm remove-btn">×</button></div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="order-cart-total">
+                    Итого: {{ order.total_price }} руб.
+                </div>
+
+                <a href="{% url 'my_reservations' %}" class="btn btn-success order-cart-finish">Завершить заказ</a>
+                {% else %}
+                <p class="order-cart-empty">Добавьте блюда из меню</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+function addToOrder(reservationId, itemId) {
+    fetch(`/add-to-order/${reservationId}/${itemId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+}
+
+function updateItem(itemId, action) {
+    fetch(`/update-order-item/${itemId}/${action}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+}
+
+function removeItem(itemId) {
+    fetch(`/remove-from-order/${itemId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+}
+</script>
+{% endblock %}

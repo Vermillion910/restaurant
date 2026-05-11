@@ -1,0 +1,65 @@
+{% extends 'reservations/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Наше меню</h2>
+
+    <div class="menu-wrapper">
+        <!-- Боковое меню -->
+        <div class="menu-sidebar">
+            <div class="menu-categories">
+                <h3>Категории</h3>
+                {% for category in categories %}
+                <a href="#cat-{{ category.id }}">{{ category.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Блюда -->
+        <div class="menu-body">
+            {% for category in categories %}
+            <div id="cat-{{ category.id }}" class="menu-category">
+                <h3 class="category-title">{{ category.name }}</h3>
+
+                {% for item in category.menuitem_set.all %}
+                <div class="menu-item">
+                    <!-- Фото -->
+                    <div class="menu-item-image">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                        {% else %}
+                            Нет фото
+                        {% endif %}
+                    </div>
+                    <!-- Инфо -->
+                    <div class="menu-item-info">
+                        <div class="menu-item-header">
+                            <strong>{{ item.name }}</strong>
+                            <div class="menu-item-right">
+                                <span class="menu-item-price">{{ item.price }} руб.</span>
+                                {% if user.is_authenticated %}
+                                <a href="{% url 'add_favorite' item.id %}" class="heart-btn{% if item.id in user_favorites %} active{% endif %}" title="{% if item.id in user_favorites %}Убрать из избранного{% else %}В избранное{% endif %}">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="{% if item.id in user_favorites %}#e74c3c{% else %}none{% endif %}" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if item.weight %}
+                            <span class="menu-item-weight">({{ item.weight }})</span>
+                        {% endif %}
+                        {% if item.composition %}
+                            <p class="menu-item-composition">{{ item.composition }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="menu-empty">Нет блюд в этой категории</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
