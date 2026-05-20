@@ -55,18 +55,6 @@ def my_reservations(request):
         'favorites': [f.menu_item for f in favorites]
     })
 
-@login_required
-def cancel_reservation(request, pk):
-    """Отмена бронирования"""
-    reservation = get_object_or_404(Reservation, pk=pk, user=request.user)
-    if request.method == 'POST':
-        reservation.status = 'cancelled'
-        reservation.save()
-        messages.success(request, 'Бронирование отменено')
-        return redirect('my_reservations')
-    return render(request, 'reservations/cancel_reservation.html', {'reservation': reservation})
-
-
 def menu(request):
     """Страница с меню"""
     categories = MenuCategory.objects.prefetch_related('menuitem_set').all()
@@ -215,7 +203,66 @@ def event_detail(request, event_id):
     return render(request, 'reservations/event_detail.html', {'event': event})
 
 
+from django.http import JsonResponse
 
 
+@login_required
+def cancel_reservation_ajax(request, pk):
+    """Отмена бронирования через AJAX (модальное окно)"""
+    if request.method == 'POST':
+        try:
+            reservation = Reservation.objects.get(pk=pk, user=request.user)
 
+            if reservation.status == 'cancelled':
+                return JsonResponse({'success': False, 'error': 'Бронирование уже отменено'})
+
+            reservation.status = 'cancelled'
+            reservation.save()
+
+            return JsonResponse({'success': True})
+
+        except Reservation.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Бронирование не найдено'}, status=404)
+
+    return JsonResponse({'success': False, 'error': 'Неверный метод запроса'}, status=400)
+
+
+from django.http import JsonResponse
+
+
+@login_required
+def add_favorite_ajax(request, item_id):
+    """Добавление/удаление из избранного через AJAX (без перезагрузки)"""
+    menu_item = get_object_or_404(MenuItem, id=item_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, menu_item=menu_item)
+
+    if not created:
+        favorite.delete()
+        is_favorite = False
+    else:
+        is_favorite = True
+
+    return JsonResponse({
+        'success': True,
+        'is_favorite': is_favorite,
+        'message': 'Добавлено в избранное' if is_favorite else 'Удалено из избранного'
+    })
+
+
+from django.http import JsonResponse
+
+
+@login_required
+def remove_favorite_ajax(request, item_id):
+    """Удаление из избранного через AJAX (без перезагрузки)"""
+    try:
+        menu_item = get_object_or_404(MenuItem, id=item_id)
+        deleted, _ = Favorite.objects.filter(user=request.user, menu_item=menu_item).delete()
+
+        if deleted:
+            return JsonResponse({'success': True, 'message': 'Удалено из избранного'})
+        else:
+            return JsonResponse({'success': False, 'error': 'Блюдо не найдено в избранном'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 

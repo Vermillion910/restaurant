@@ -22,7 +22,7 @@
                 <h3 class="category-title">{{ category.name }}</h3>
 
                 {% for item in category.menuitem_set.all %}
-                <div class="menu-item">
+                <div class="menu-item" id="menu-item-{{ item.id }}">
                     <!-- Фото -->
                     <div class="menu-item-image">
                         {% if item.image %}
@@ -38,11 +38,17 @@
                             <div class="menu-item-right">
                                 <span class="menu-item-price">{{ item.price }} руб.</span>
                                 {% if user.is_authenticated %}
-                                <a href="{% url 'add_favorite' item.id %}" class="heart-btn{% if item.id in user_favorites %} active{% endif %}" title="{% if item.id in user_favorites %}Убрать из избранного{% else %}В избранное{% endif %}">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="{% if item.id in user_favorites %}#e74c3c{% else %}none{% endif %}" stroke="currentColor" stroke-width="2">
+                                <button
+                                    onclick="toggleFavorite({{ item.id }}, this)"
+                                    class="heart-btn"
+                                    data-favorite="{% if item.id in user_favorites %}true{% else %}false{% endif %}"
+                                    title="{% if item.id in user_favorites %}Убрать из избранного{% else %}В избранное{% endif %}">
+                                    <svg width="20" height="20" viewBox="0 0 24 24"
+                                        fill="{% if item.id in user_favorites %}#e74c3c{% else %}none{% endif %}"
+                                        stroke="currentColor" stroke-width="2">
                                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                                     </svg>
-                                </a>
+                                </button>
                                 {% endif %}
                             </div>
                         </div>
@@ -62,4 +68,104 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleFavorite(itemId, btnElement) {
+    const svg = btnElement.querySelector('svg');
+    const isFavorite = btnElement.dataset.favorite === 'true';
+
+    fetch(`/add-favorite-ajax/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.is_favorite) {
+                // Добавлено в избранное
+                btnElement.dataset.favorite = 'true';
+                svg.setAttribute('fill', '#e74c3c');
+                btnElement.title = 'Убрать из избранного';
+                showNotification('Добавлено в избранное', 'success');
+            } else {
+                // Удалено из избранного
+                btnElement.dataset.favorite = 'false';
+                svg.setAttribute('fill', 'none');
+                btnElement.title = 'В избранное';
+                showNotification('Удалено из избранного', 'success');
+            }
+        } else {
+            showNotification(data.error || 'Ошибка', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Произошла ошибка', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 4px;
+        color: white;
+        z-index: 1000;
+        background: ${type === 'success' ? '#7a8b6a' : '#a08080'};
+        animation: fadeOut 3s forwards;
+    `;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+<style>
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+.heart-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    color: #c4b8a8;
+    transition: transform 0.2s ease;
+}
+.heart-btn:hover {
+    transform: scale(1.2);
+}
+.notification {
+    font-family: 'Georgia', serif;
+    font-size: 14px;
+}
+</style>
 {% endblock %}

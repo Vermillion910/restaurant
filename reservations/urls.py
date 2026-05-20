@@ -7,7 +7,6 @@ urlpatterns = [
     path('menu/', views.menu, name='menu'),
     path('reserve/', views.make_reservation, name='make_reservation'),
     path('my-reservations/', views.my_reservations, name='my_reservations'),
-    path('cancel/<int:pk>/', views.cancel_reservation, name='cancel_reservation'),
     path('order-food/<int:reservation_id>/', views.order_food, name='order_food'),
     path('add-to-order/<int:reservation_id>/<int:item_id>/', views.add_to_order, name='add_to_order'),
     path('remove-from-order/<int:item_id>/', views.remove_from_order, name='remove_from_order'),
@@ -19,4 +18,7 @@ urlpatterns = [
     path('events/', views.events, name='events'),
     path('events/', views.events, name='events'),
     path('event/<int:event_id>/', views.event_detail, name='event_detail'),
+    path('cancel-ajax/<int:pk>/', views.cancel_reservation_ajax, name='cancel_reservation_ajax'),
+    path('add-favorite-ajax/<int:item_id>/', views.add_favorite_ajax, name='add_favorite_ajax'),
+    path('remove-favorite-ajax/<int:item_id>/', views.remove_favorite_ajax, name='remove_favorite_ajax'),
 ]
